@@ -1,3 +1,4 @@
+import http.client
 import cv2
 import json
 import numpy as np
@@ -137,6 +138,14 @@ def show_mobilenet_ssd(detections, frame, **kwargs):
             label = labels[detection["label"]]
         else:
             label = str(detection["label"])
+
+
+        # send it
+        connection = http.client.HTTPConnection('localhost', 8888)
+        connection.request("GET", "/api/service/python/exec/onDepthAi('" + label + "')")
+        response = connection.getresponse()
+        print("Status: {} and reason: {}".format(response.status, response.reason))
+        print(response.read().decode())
 
         pt_t1 = x1, y1 + 20
         cv2.putText(frame, label, pt_t1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
